@@ -204,7 +204,7 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
       // Spawner Logic
       if (this.time > this.nextSpawn) {
         this.spawnRandomShip();
-        this.nextSpawn = this.time + 10 + Math.random() * 10;
+        this.nextSpawn = this.time + 3 + Math.random() * 5;
       }
 
       // Move Active Ships
