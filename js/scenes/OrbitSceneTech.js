@@ -284,8 +284,8 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
 
       scene.add(anchor);
 
-      // 4. Randomize Speed (Adjusted: 0.05 to 0.10)
-      const speed = 0.05 + Math.random() * 0.05;
+      // 4. Randomize Speed (Adjusted: Slower/Majestic 0.01 to 0.03)
+      const speed = 0.01 + Math.random() * 0.02;
 
       // We track the ANCHOR now
       this.activeShips.push({ mesh: anchor, start, end, life: 0, speed, rollSpeed: 0 });

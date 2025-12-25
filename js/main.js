@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { CONFIG } from './config.js';
 import { InputManager } from './utils/InputManager.js';
-import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_DEBUG_PROBE_V1';
+import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_MAJESTIC_V25';
 import { createSurfaceScene } from './scenes/SurfaceSceneV2.js?v=HOTFIX_CASE_SENSITIVE_V2';
 
 class App {
