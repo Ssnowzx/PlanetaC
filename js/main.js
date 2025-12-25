@@ -80,6 +80,12 @@ class App {
 
     // Load Ship GLB
     const gltfLoader = new GLTFLoader(this.loadingManager);
+
+    // Setup Draco
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    gltfLoader.setDRACOLoader(dracoLoader);
+
     gltfLoader.load('./assets/models/nave.glb', (gltf) => {
       this.shipModel = gltf.scene;
       this.shipAnimations = gltf.animations; // Capture animations
