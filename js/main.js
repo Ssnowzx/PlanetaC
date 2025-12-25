@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { CONFIG } from './config.js';
 import { InputManager } from './utils/InputManager.js';
-import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_SPAWN_RESTORED_V23';
+import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_DEBUG_PROBE_V1';
 import { createSurfaceScene } from './scenes/SurfaceSceneV2.js?v=HOTFIX_CASE_SENSITIVE_V2';
 
 class App {
@@ -373,69 +373,78 @@ class App {
   animate() {
     requestAnimationFrame(() => this.animate());
 
-    const delta = this.clock.getDelta();
-    const time = this.clock.getElapsedTime();
+    try {
+      const delta = this.clock.getDelta();
+      const time = this.clock.getElapsedTime();
 
-    if (this.viewMode === "transition") {
-      if (this.transitionMixer) {
-        this.transitionMixer.update(delta);
-      }
-      this.renderer.render(this.transitionScene, this.transitionCamera);
-    }
-    else if (this.viewMode === "orbit") {
-      if (this.orbitData) {
-        this.orbitData.planet.rotation.y += 0.002;
-        this.orbitData.planet.rotation.x += 0.0005;
-        this.orbitData.stars.rotation.y += 0.0001;
-        if (this.orbitData.planet.userData.update) {
-          // Pass delta (approx 1/60) for physics
-          this.orbitData.planet.userData.update(time, 0.016);
+      if (this.viewMode === "transition") {
+        if (this.transitionMixer) {
+          this.transitionMixer.update(delta);
         }
-        this.orbitData.controls.update();
-        this.renderer.render(this.orbitData.scene, this.orbitData.camera);
+        this.renderer.render(this.transitionScene, this.transitionCamera);
       }
-    } else {
-      if (this.surfaceData) {
-        // Update Rover
-        this.surfaceData.rover.update(delta, this.inputManager, this.surfaceData.collidableObjects);
-
-        // Camera Follow
-        const roverMesh = this.surfaceData.rover.mesh;
-        const offset = new THREE.Vector3(0, 5, 12).applyQuaternion(roverMesh.quaternion);
-        const lookat = new THREE.Vector3(0, 2, 0).applyQuaternion(roverMesh.quaternion);
-
-        this.surfaceData.camera.position.lerp(roverMesh.position.clone().add(offset), 0.1);
-        this.surfaceData.camera.lookAt(roverMesh.position.clone().add(lookat));
-
-        // Animate Antenna
-        if (this.surfaceData.antennaLight) {
-          this.surfaceData.antennaLight.material.opacity = (Math.sin(time * 5) + 1) / 2;
-        }
-
-        // Update animated objects in scene (like AdrenaSign)
-        this.surfaceData.scene.children.forEach(child => {
-          if (child.userData && typeof child.userData.update === 'function') {
-            child.userData.update(delta, time);
+      else if (this.viewMode === "orbit") {
+        if (this.orbitData) {
+          this.orbitData.planet.rotation.y += 0.002;
+          this.orbitData.planet.rotation.x += 0.0005;
+          this.orbitData.stars.rotation.y += 0.0001;
+          if (this.orbitData.planet.userData.update) {
+            // Pass delta (approx 1/60) for physics
+            this.orbitData.planet.userData.update(time, 0.016);
           }
-        });
-
-        // Update Alien Animation
-        if (this.surfaceData.alienMixer) {
-          this.surfaceData.alienMixer.update(delta);
+          this.orbitData.controls.update();
+          this.renderer.render(this.orbitData.scene, this.orbitData.camera);
         }
+      } else {
+        if (this.surfaceData) {
+          // Update Rover
+          this.surfaceData.rover.update(delta, this.inputManager, this.surfaceData.collidableObjects);
 
-        // Update Temple Animation
-        // Update Temple Animation
-        if (this.surfaceData.templeMixer) {
-          this.surfaceData.templeMixer.update(delta);
+          // Camera Follow
+          const roverMesh = this.surfaceData.rover.mesh;
+          const offset = new THREE.Vector3(0, 5, 12).applyQuaternion(roverMesh.quaternion);
+          const lookat = new THREE.Vector3(0, 2, 0).applyQuaternion(roverMesh.quaternion);
+
+          this.surfaceData.camera.position.lerp(roverMesh.position.clone().add(offset), 0.1);
+          this.surfaceData.camera.lookAt(roverMesh.position.clone().add(lookat));
+
+          // Animate Antenna
+          if (this.surfaceData.antennaLight) {
+            this.surfaceData.antennaLight.material.opacity = (Math.sin(time * 5) + 1) / 2;
+          }
+
+          // Update animated objects in scene (like AdrenaSign)
+          this.surfaceData.scene.children.forEach(child => {
+            if (child.userData && typeof child.userData.update === 'function') {
+              child.userData.update(delta, time);
+            }
+          });
+
+          // Update Alien Animation
+          if (this.surfaceData.alienMixer) {
+            this.surfaceData.alienMixer.update(delta);
+          }
+
+          // Update Temple Animation
+          if (this.surfaceData.templeMixer) {
+            this.surfaceData.templeMixer.update(delta);
+          }
+
+          // Update Ship Animation
+          if (this.surfaceData.shipMixer) {
+            this.surfaceData.shipMixer.update(delta);
+          }
+
+          this.renderer.render(this.surfaceData.scene, this.surfaceData.camera);
         }
-
-        // Update Ship Animation
-        if (this.surfaceData.shipMixer) {
-          this.surfaceData.shipMixer.update(delta);
-        }
-
-        this.renderer.render(this.surfaceData.scene, this.surfaceData.camera);
+      }
+    } catch (e) {
+      console.error("ANIMATION LOOP ERROR:", e);
+      // Only show error once to avoid flooding
+      if (!this.hasShownError) {
+        this.ui.infoText.innerHTML = `ERROR: ${e.message}`;
+        this.ui.infoText.style.color = 'red';
+        this.hasShownError = true;
       }
     }
   }
