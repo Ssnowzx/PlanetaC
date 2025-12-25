@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Cybertruck } from '../entities/Cybertruck.js';
-import { createAdrenaSign } from '../entities/AdrenaSign.js';
+import { createAdrenaSign } from '../entities/AdrenaSign.js?v=HOTFIX_HALFSIZE';
 import { createToxicLab } from '../entities/ToxicLab.js';
 import { getGroundHeight } from '../utils/Terrain.js';
 import { CONFIG } from '../config.js';

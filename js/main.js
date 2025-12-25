@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CONFIG } from './config.js';
 import { InputManager } from './utils/InputManager.js';
 import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_SHIPS_FIX_INIT_V14';
-import { createSurfaceScene } from './scenes/SurfaceSceneV2.js?v=ADRENA_TRANSITION_V4_RAYCAST';
+import { createSurfaceScene } from './scenes/SurfaceSceneV2.js?v=HOTFIX_REFRESH';
 
 class App {
   constructor() {
