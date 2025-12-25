@@ -139,7 +139,7 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
   });
 
   // Hook into Shader to animate texture
-  /*
+  // Hook into Shader to animate texture
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = { value: 0 };
     planet.userData.shaderUniforms = shader.uniforms;
@@ -155,7 +155,6 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
         `
     );
   };
-  */
 
   const planet = new THREE.Mesh(baseGeometry, material);
   planet.rotation.z = Math.PI / 2;
@@ -252,8 +251,8 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
 
       // ... (keep middle lines same) ...
 
-      // 4. Randomize Speed (SLOWER: 0.02 to 0.04)
-      const speed = 0.02 + Math.random() * 0.02;
+      // 4. Randomize Speed (Adjusted: 0.05 to 0.10)
+      const speed = 0.05 + Math.random() * 0.05;
 
       // We track the ANCHOR now
       this.activeShips.push({ mesh: anchor, start, end, life: 0, speed, rollSpeed: 0 });
