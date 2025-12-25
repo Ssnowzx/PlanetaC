@@ -176,6 +176,7 @@ export function createAdrenaSign(texture) {
 
   // 1. Main Cube Shop
   const shopSize = 15;
+  const halfSize = shopSize / 2; // Fixed ReferenceError
   const shopGeo = new THREE.BoxGeometry(shopSize, shopSize, shopSize);
   const shopBody = new THREE.Mesh(shopGeo, blackStone);
   shopBody.position.set(0, shopSize / 2, 0); // Sit on ground
