@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { CONFIG } from './config.js';
 import { InputManager } from './utils/InputManager.js';
 import { createOrbitScene } from './scenes/OrbitSceneTech.js?v=ORBIT_SHIPS_FIX_INIT_V14';
