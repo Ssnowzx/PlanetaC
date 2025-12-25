@@ -139,11 +139,10 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
   });
 
   // Hook into Shader to animate texture
-  // Hook into Shader to animate texture
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = { value: 0 };
     planet.userData.shaderUniforms = shader.uniforms;
-    shader.fragmentShader = `uniform float uTime;` + shader.fragmentShader;
+    shader.fragmentShader = `uniform float uTime;\n` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <emissivemap_fragment>',
       `
@@ -195,15 +194,24 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
     activeShips: [],
     spawned: [false, false, false],
     nextSpawn: 0.5,
+    shipIndex: 0, // Sequential Index
 
     update: function (delta) {
       if (!delta) delta = 0.016;
       this.time += delta;
 
-      // Spawner Logic
-      if (this.time > this.nextSpawn) {
-        this.spawnRandomShip();
-        this.nextSpawn = this.time + 3 + Math.random() * 5;
+      // 1. STRICT CHECK: If any ship is active, DO NOT spawn another.
+      if (this.activeShips.length > 0) {
+        // Just update the active ship(s)
+        // (Loop logic below handles movement)
+      } else {
+        // Only if NO ships are active, check timer
+        if (this.time > this.nextSpawn) {
+          this.spawnNextShip();
+          // Set delay for NEXT spawn after this one finishes
+          // Actual delay is handled when ship dies, this is just a safety fallback
+          this.nextSpawn = this.time + 999; // Lock spawner until ship dies
+        }
       }
 
       // Move Active Ships
@@ -214,44 +222,56 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
         if (item.life > 1.0) {
           scene.remove(item.mesh);
           this.activeShips.splice(i, 1);
+          // Ship Finished! Set timer for next sequential spawn
+          // Short interval: 2 to 4 seconds
+          this.nextSpawn = this.time + 2.0 + Math.random() * 2.0;
         } else {
           item.mesh.position.lerpVectors(item.start, item.end, item.life);
           item.mesh.lookAt(item.end);
-          if (item.rollSpeed) item.mesh.rotation.z += delta * item.rollSpeed;
-          item.mesh.position.y += Math.sin(this.time * 2.0) * 0.1;
+
+          if (item.speed < 0.03) {
+            // Roll only for slower/majestic ships
+            item.mesh.rotation.z += delta * 0.1;
+          }
+
+          // Gentle Floating (Y-axis only)
+          item.mesh.position.y += Math.sin(this.time * 1.5) * 0.2;
         }
       }
     },
 
-    spawnRandomShip: function () {
+    spawnNextShip: function () {
       const validShips = this.ships.filter(s => s !== null);
       if (validShips.length === 0) return;
 
-      // 1. Pick Random Ship
-      const shipTemplate = validShips[Math.floor(Math.random() * validShips.length)];
+      // 1. Pick Next Ship in Sequence
+      const shipTemplate = validShips[this.shipIndex % validShips.length];
+      this.shipIndex++;
 
       // Clone
       const mesh = shipTemplate.clone();
 
-      // ROTATION FIX: Rotate internal mesh
-      mesh.rotation.y = Math.PI / 2;
+      // ROTATION FIX: 
+      // User reported "Sideways" -> Model is likely X-axis aligned. 
+      // We rotate -90 degrees Y to align X to Z (Forward).
+      mesh.rotation.set(0, -Math.PI / 2, 0);
 
       const anchor = new THREE.Group();
       anchor.add(mesh);
 
       // 2. Apply Scene Scale
-      const s = 2.0 + Math.random() * 2.0;
+      const s = 1.5 + Math.random() * 1.5; // Slightly smaller to avoid clutter
       anchor.scale.set(s, s, s);
 
       // 3. Depth: Safe Zone
-      const zDepth = 50 + Math.random() * 40;
+      const zDepth = 40 + Math.random() * 40;
 
-      // Pick Start Edge
+      // Pick Start Edge (Random direction is fine, sequential ships can come from anywhere)
       const edge = Math.floor(Math.random() * 4);
       const start = new THREE.Vector3();
       const end = new THREE.Vector3();
 
-      const spread = 80;
+      const spread = 60; // Tighter spread
       const rangeX = 350;
       const rangeY = 250;
 
@@ -284,21 +304,24 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
 
       scene.add(anchor);
 
-      // 4. Randomize Speed (Adjusted: Slower/Majestic 0.01 to 0.03)
-      const speed = 0.01 + Math.random() * 0.02;
+      // 4. Constant Speed (Standardized)
+      const speed = 0.015; // Consistent majestic speed
 
       // We track the ANCHOR now
       this.activeShips.push({ mesh: anchor, start, end, life: 0, speed, rollSpeed: 0 });
-      console.log("Spawned Anchored Ship:", edge, zDepth);
+      console.log("Spawned Single Ship Sequence:", this.shipIndex, edge);
     },
   };
 
   // Combine Updates (Shader + Physics)
   const shaderUpdate = planet.userData.update;
   planet.userData.update = (time, delta) => {
-    // SLOW DOWN PULSE (time * 0.2)
+    // PULSE SPEED (time * 0.2)
     if (shaderUpdate) shaderUpdate(time * 0.2);
+
+    // Flyby Update
     flybyManager.update(delta);
+
     // SLOW DOWN STARS
     if (stars.rotation) stars.rotation.y += (delta || 0.01) * 0.01;
   };
