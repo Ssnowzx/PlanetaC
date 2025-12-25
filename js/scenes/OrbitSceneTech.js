@@ -237,6 +237,12 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
       // --- FIX: USE ANCHOR TO PRESERVE NORMALIZATION ---
       // We wrap the normalized mesh in an 'anchor' to apply scene-level scaling.
       // If we scaled 'mesh' directly, we would lost the normalization factor.
+
+      // ROTATION FIX: Rotate internal mesh to face forward (if sideways)
+      // Assuming 'Native' model faces +Z, but lookAt points +Z.
+      // If user says "sideways", it might need 90 deg rotation.
+      mesh.rotation.y = Math.PI / 2; // Try 90 degrees correction
+
       const anchor = new THREE.Group();
       anchor.add(mesh);
 
@@ -244,49 +250,10 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
       const s = 2.0 + Math.random() * 2.0;
       anchor.scale.set(s, s, s);
 
-      // 3. Depth: Safe Zone (50 to 90)
-      const zDepth = 50 + Math.random() * 40;
+      // ... (keep middle lines same) ...
 
-      // Pick Start Edge
-      const edge = Math.floor(Math.random() * 4);
-      const start = new THREE.Vector3();
-      const end = new THREE.Vector3();
-
-      const spread = 80;
-      const rangeX = 350;
-      const rangeY = 250;
-
-      switch (edge) {
-        case 0: // Left -> Right
-          start.set(-rangeX, (Math.random() - 0.5) * spread, zDepth);
-          end.set(rangeX, (Math.random() - 0.5) * spread, zDepth);
-          break;
-        case 1: // Right -> Left
-          start.set(rangeX, (Math.random() - 0.5) * spread, zDepth);
-          end.set(-rangeX, (Math.random() - 0.5) * spread, zDepth);
-          break;
-        case 2: // Top -> Bottom
-          start.set((Math.random() - 0.5) * spread, rangeY, zDepth);
-          end.set((Math.random() - 0.5) * spread, -rangeY, zDepth);
-          break;
-        case 3: // Bottom -> Top
-          start.set((Math.random() - 0.5) * spread, -rangeY, zDepth);
-          end.set((Math.random() - 0.5) * spread, rangeY, zDepth);
-          break;
-      }
-
-      // Position Anchor
-      anchor.position.copy(start);
-      anchor.lookAt(end);
-
-      // Force Matrix Update
-      anchor.updateMatrix();
-      anchor.updateMatrixWorld(true);
-
-      scene.add(anchor);
-
-      // 4. Randomize Speed
-      const speed = 0.08 + Math.random() * 0.05;
+      // 4. Randomize Speed (SLOWER: 0.02 to 0.04)
+      const speed = 0.02 + Math.random() * 0.02;
 
       // We track the ANCHOR now
       this.activeShips.push({ mesh: anchor, start, end, life: 0, speed, rollSpeed: 0 });
@@ -297,9 +264,11 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
   // Combine Updates (Shader + Physics)
   const shaderUpdate = planet.userData.update;
   planet.userData.update = (time, delta) => {
-    if (shaderUpdate) shaderUpdate(time);
+    // SLOW DOWN PULSE (time * 0.2)
+    if (shaderUpdate) shaderUpdate(time * 0.2);
     flybyManager.update(delta);
-    if (stars.rotation) stars.rotation.y += (delta || 0.01) * 0.05;
+    // SLOW DOWN STARS
+    if (stars.rotation) stars.rotation.y += (delta || 0.01) * 0.01;
   };
 
   return { scene, camera, controls, planet, stars };
