@@ -1,62 +1,41 @@
 # Universo com Planeta C
 
-Este projeto é uma simulação 3D interativa de um planeta em forma de "C" (Planeta C), com visualização orbital e exploração de superfície, desenvolvida em JavaScript usando Three.js.
+Este projeto é uma simulação 3D interativa imersiva ("Planeta C"), com visualização orbital, transições cinematográficas e uma superfície procedural rica, desenvolvida em Modern JavaScript e Three.js.
+
+## Destaques Tecnológicos
+
+### 1. Arquitetura 2.5D Híbrida (Volumétrica)
+A nave (Rover) não é um modelo 3D tradicional, mas sim uma entidade volumétrica criada através de **Sprite Stacking**. 40 camadas de sprites 2D são empilhadas verticalmente e renderizadas com um shader personalizado, criando uma ilusão 3D convincente com performance extremamente leve (estilo retro-futurista).
+
+### 2. Shaders Procedurais e VFX
+- **Portal de Vórtex:** O portal da loja Adrena utiliza um `ShaderMaterial` personalizado que gera um túnel infinito animado matematicamente (sem textura de imagem), com efeitos de distorção de tempo e partículas de sucção.
+- **Keying em Tempo Real:** As sprites da nave utilizam um shader de fragmento para remover o fundo branco (chroma key) e aplicar tintura baseada na profundidade da camada em tempo real.
+- **Poeira e Rastros:** Sistema de partículas dinâmico que reage à velocidade da nave e à altura do terreno.
+
+### 3. Texturas Procedurais (Geradas em Código)
+Para otimizar o tempo de carregamento e o uso de memória, muitas texturas (como os painéis de circuitos do chão e da loja Adrena) são geradas algoritmicamente em tempo de execução usando o HTML Canvas API. Isso garante:
+- Resolução infinita (sem pixelização).
+- Cores dinâmicas (tema Cyberpunk).
+- Peso de arquivo zero (sem JPGs pesados para carregar).
 
 ## Funcionalidades
+- **Modo Órbita:** Visualização planetária com navios em órbita dinâmica.
+- **Exploração de Superfície:**
+  - Pilotagem com física de hover (flutuação).
+  - Terreno deformado proceduralmente (heightmap).
+  - Edifícios interativos (Loja Adrena, Templo de Treinamento).
+  - Links externos integrados ao mundo 3D (clique nos prédios).
 
-- **Visualização orbital:** Gire, aproxime e afaste a câmera ao redor do Planeta C em 3D.
-- **Planeta C 3D:** O planeta é um cilindro deformado em arco, com textura lunar realista e normal map.
-- **Transição de modos:** Clique no planeta para "aterrizar" e explorar a superfície.
-- **Superfície explorável:** Controle um rover com as setas do teclado sobre uma planície texturizada com a superfície lunar.
-- **Colônia e objetos:** Estruturas 3D (colônia, domo, antena, outdoor) e interação com outdoor (abre link).
-- **Estrelas:** Fundo de estrelas em ambas as cenas.
-- **Responsivo:** O canvas ocupa sempre 100% da tela, adaptando-se a qualquer tamanho de janela.
+## Como Rodar
+1. Servidor local: `python3 -m http.server 8080`
+2. Acesse: `http://localhost:8080`
 
-## Como usar
+## Controles
+- **WASD / Setas:** Pilotar a nave.
+- **Clique:** Interagir com portais e objetos.
+- **Scroll/Zoom:** Ajustar câmera em órbita.
 
-1. Acesse a aplicação publicada (por exemplo, no Vercel) em um navegador moderno (Chrome, Firefox, Edge, Safari).
-2. Aguarde o carregamento das texturas (pode demorar alguns segundos na primeira vez).
-3. **Modo órbita:**
-   - Use o mouse para girar e dar zoom ao redor do planeta.
-   - Clique no planeta para "aterrizar".
-4. **Modo superfície:**
-   - Use as setas do teclado para dirigir o rover.
-   - Clique no outdoor para abrir o manual do iniciante em C.
-   - Clique em "Voltar à Órbita" para retornar à visão orbital.
-
-## Estrutura do projeto
-
-- `Planetac.html`: Arquivo principal, contém todo o código JavaScript, HTML e CSS.
-- `README.md`: Este arquivo de instruções.
-
-## Detalhes técnicos
-
-- **Three.js** é carregado via CDN (importmap).
-- **Texturas:**
-  - Textura lunar: https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_1024.jpg
-  - Normal map lunar: https://c1.staticflickr.com/9/8248/8645325193_50d559a39d_b.jpg
-- **Planeta C:**
-  - Criado a partir de um `CylinderGeometry` deformado em arco.
-  - Mapeamento UV padrão do cilindro, com `repeat.set(4, 2)`.
-  - Material: `MeshStandardMaterial` com textura e normal map.
-- **Chão:**
-  - `PlaneGeometry` grande, com as mesmas texturas da lua, `repeat.set(20, 20)`.
-- **Responsividade:**
-  - O canvas usa `width: 100vw; height: 100vh` e o renderer/câmeras são ajustados no evento de resize.
-- **Fallback:**
-  - Se as texturas não carregarem, o planeta e o chão aparecem em cinza.
-
-## Possíveis problemas
-
-- Se as texturas não aparecerem:
-  - Verifique sua conexão com a internet.
-  - Teste em outro navegador ou aba anônima.
-  - Veja o console do navegador para mensagens de erro de CORS ou rede.
-
-## Créditos
-
-- Textura lunar: [three.js examples](https://github.com/mrdoob/three.js/tree/master/examples/textures/planets)
-- Normal map lunar: [Flickr - NASA Goddard](https://www.flickr.com/photos/gsfc/8645325193)
-- Código e modelagem: Adaptado por snows
-
----
+## Stack
+- **JavaScript (ES6+)**
+- **Three.js (WebGL)**
+- **GLSL (Shaders)**
