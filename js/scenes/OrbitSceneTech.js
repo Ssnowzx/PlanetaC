@@ -147,7 +147,8 @@ export function createOrbitScene(renderer, moonTexture, moonNormalMap, planetShi
       '#include <emissivemap_fragment>',
       `
         #include <emissivemap_fragment>
-        float flow = sin(vMapUv.x * 30.0 + uTime * 3.0) + sin(vMapUv.y * 30.0 - uTime * 2.0);
+        vec2 uvPulse = vMapUv; 
+        float flow = sin(uvPulse.x * 30.0 + uTime * 3.0) + sin(uvPulse.y * 30.0 - uTime * 2.0);
         float pulse = smoothstep(0.5, 0.6, flow) - smoothstep(0.6, 0.7, flow);
         vec3 pulseColor = vec3(0.0, 1.0, 1.0) * pulse * 2.0;
         totalEmissiveRadiance += pulseColor; 

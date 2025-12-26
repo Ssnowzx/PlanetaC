@@ -186,7 +186,7 @@ class App {
     this.planetShips = [null, null, null, null, null, null];
     const shipFiles = [
       'navePlanetaria1.glb', 'navePlanetaria2.glb',
-      'navePlanetaria4.glb', 'navePlanetaria5.glb', 'navePlanetaria6.glb'
+      'navePlanetaria5.glb', 'navePlanetaria6.glb'
     ];
     shipFiles.forEach((file, index) => {
       gltfLoader.load(`./assets/models/${file}`, (gltf) => {
