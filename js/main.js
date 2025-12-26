@@ -42,8 +42,12 @@ class App {
   init() {
     try {
       const canvas = document.getElementById("main-canvas");
-      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-      this.renderer.setPixelRatio(window.devicePixelRatio);
+      // OPTIMIZATION: Disable Antialias for performance
+      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance" });
+
+      // OPTIMIZATION: Cap Pixel Ratio to 1.0 (Critical for Mobile Performance)
+      // Most phones have 3x pixel ratio, rendering 9x pixels. Capping to 1 makes it 900% faster.
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.renderer.shadowMap.enabled = true;
       this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;

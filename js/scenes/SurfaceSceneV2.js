@@ -7,8 +7,8 @@ import { CONFIG } from '../config.js';
 
 // --- Local Texture Generator to force update ---
 function createGroundCircuitTexture() {
-  const width = 1024;
-  const height = 1024;
+  const width = 512; // OPTIMIZATION: Reduced from 1024
+  const height = 512;
 
   const canvasDiffuse = document.createElement('canvas');
   const canvasRoughness = document.createElement('canvas');
@@ -117,7 +117,7 @@ export function createSurfaceScene(renderer, envMap, moonTexture, moonNormalMap,
     t.anisotropy = maxAnisotropy;
   });
 
-  const groundGeo = new THREE.PlaneGeometry(3000, 3000, 200, 200);
+  const groundGeo = new THREE.PlaneGeometry(3000, 3000, 64, 64); // OPTIMIZATION: Reduced segments (200->64)
   const pos = groundGeo.attributes.position;
 
   // Keep the terrain height heightmap
@@ -413,8 +413,8 @@ export function createSurfaceScene(renderer, envMap, moonTexture, moonNormalMap,
   const sun = new THREE.DirectionalLight(0xffffff, 1.5);
   sun.position.set(200, 400, 200);
   sun.castShadow = true;
-  sun.shadow.mapSize.width = 4096;
-  sun.shadow.mapSize.height = 4096;
+  sun.shadow.mapSize.width = 1024; // OPTIMIZATION: Reduced from 4096
+  sun.shadow.mapSize.height = 1024;
   sun.shadow.camera.left = -500;
   sun.shadow.camera.right = 500;
   sun.shadow.camera.top = 500;
