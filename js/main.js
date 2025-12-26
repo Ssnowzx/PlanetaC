@@ -72,6 +72,39 @@ class App {
       onComplete();
     };
 
+    this.loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const percentage = Math.round((itemsLoaded / itemsTotal) * 100);
+      const text = this.ui.loadingScreen.querySelector('.loading-text');
+      if (text) text.innerText = `CARREGANDO SISTEMAS... ${percentage}%`;
+      // console.log(`Loading file: ${url}.\nLoaded ${itemsLoaded} of ${itemsTotal} files.`);
+    };
+
+    this.loadingManager.onError = (url) => {
+      console.error('There was an error loading ' + url);
+      const text = this.ui.loadingScreen.querySelector('.loading-text');
+      if (text) text.innerText = `ERRO NO RECURSO: ${url.split('/').pop()}`;
+      if (text) text.style.color = 'red';
+    };
+
+    // Safety Timeout: Force start after 15 seconds if stuck
+    setTimeout(() => {
+      if (this.ui.loadingScreen.style.display !== "none") {
+        console.warn("Loading taking too long. Forcing start...");
+        const text = this.ui.loadingScreen.querySelector('.loading-text');
+        if (text) {
+          text.innerText = "INICIALIZAÇÃO FORÇADA...";
+          text.style.color = "orange";
+        }
+        setTimeout(() => {
+          this.ui.loadingScreen.style.opacity = "0";
+          setTimeout(() => {
+            this.ui.loadingScreen.style.display = "none";
+            onComplete();
+          }, 800);
+        }, 1000);
+      }
+    }, 15000);
+
     const textureLoader = new THREE.TextureLoader(this.loadingManager);
     this.moonTexture = textureLoader.load(CONFIG.textures.moon);
     if (CONFIG.textures.moonNormal) {
